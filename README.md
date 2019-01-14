@@ -25,8 +25,7 @@ $ chmod +x cloud_sql_proxy
 
 #### Executando
 
-Para executar o Cloud SQL Proxy, é necessário a string de nome da instância do Cloud SQL, localizada ao clicar em uma instância na [Lista de Instâncias do Cloud SQL](https://console.cloud.google.com/sql/instances/). O formato dessa string é `
-<NOME DO PROJETO>:<REGIÃO DO PROJETO>:<NOME DA INSTÂNCIA>`. Após isso, existem 2 modos de funcionamento do proxy:
+Para executar o Cloud SQL Proxy, é necessário a string de nome da instância do Cloud SQL, localizada ao clicar em uma instância na [Lista de Instâncias do Cloud SQL](https://console.cloud.google.com/sql/instances/). O formato dessa string é `<NOME DO PROJETO>:<REGIÃO DO PROJETO>:<NOME DA INSTÂNCIA`. Após isso, existem 2 modos de funcionamento do proxy:
 
 **Socket TCP:** Este método pode ser utilizado para conectar ao banco na nuvem utilizando o MySQL Workbench. Ele cria um Socket TCP que pode ser usado para conectar nas instâncias do Cloud SQL de forma 'tradicional'. Para utilizar este modo, basta rodar:
 
