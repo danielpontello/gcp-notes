@@ -1,37 +1,72 @@
-## Welcome to GitHub Pages
+## Introdução
 
-You can use the [editor on GitHub](https://github.com/danielpontello/gcp-notes/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+Este repositório contém algumas anotações sobre os serviços do Google Cloud Platform, escritas a medida que vou descobrindo os recursos da plataforma.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Cloud SQL
 
-### Markdown
+O Cloud SQL é o serviço de Banco de Dados SQL do GCP, permitindo a criação de bancos MySQL e PostgreSQL.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Confguração
 
-```markdown
-Syntax highlighted code block
+**APIs necessárias:** Cloud SQL Admin
 
-# Header 1
-## Header 2
-### Header 3
+### Cloud SQL Proxy 
 
-- Bulleted
-- List
+O Cloud SQL Proxy permite o acesso a instâncias do Cloud SQL via um cliente local (como o Workbench) e também permite testar de forma local aplicações do Google App Engine. 
 
-1. Numbered
-2. List
+#### Instalação
 
-**Bold** and _Italic_ and `Code` text
+Para instalar o SQL Proxy, rode os comandos abaixo:
 
-[Link](url) and ![Image](src)
+```shell
+$ wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+$ chmod +x cloud_sql_proxy
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+#### Executando
 
-### Jekyll Themes
+Para executar o Cloud SQL Proxy, é necessário a string de nome da instância do Cloud SQL, localizada ao clicar em uma instância na [Lista de Instâncias do Cloud SQL](https://console.cloud.google.com/sql/instances/). O formato dessa string é `
+<NOME DO PROJETO>:<REGIÃO DO PROJETO>:<NOME DA INSTÂNCIA>`. Após isso, existem 2 modos de funcionamento do proxy:
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/danielpontello/gcp-notes/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+**Socket TCP:** Este método pode ser utilizado para conectar ao banco na nuvem utilizando o MySQL Workbench. Ele cria um Socket TCP que pode ser usado para conectar nas instâncias do Cloud SQL de forma 'tradicional'. Para utilizar este modo, basta rodar:
 
-### Support or Contact
+```
+$ ./cloud_sql_proxy -instances=<INSTANCE_CONNECTION_NAME>=tcp:3306
+```
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+O banco de dados poderá então ser acessado utilizando o IP local (127.0.0.1 ou localhost) 
+
+**Socket Unix:** Este método cria um socket UNIX em um diretório especificado pelo usuário. Este é o mesmo método utilizado internamente pelo App Engine, permitindo que as aplicações do App Engine sejam testadas em um ambiente local com mínimas alterações. Para utilizar este modo, primeiro crie um diretório que conterá o arquivo do socket (necessita de acesso root):
+
+```
+$ sudo mkdir /cloudsql
+$ sudo chmod 777 /cloudsql
+```
+
+Após isso, execute o Proxy com:
+
+```
+$ ./cloud_sql_proxy -dir=/cloudsql &
+```
+
+O socket será criado na pasta /cloudsql/ com o nome da sua instância do Cloud SQL. Este socket então pode ser usado por sua aplicação para obter acesso ao Cloud SQL, como mostrado no exemplo abaixo. Exemplo completo disponível nos [samples oficiais do GCP no GitHub](https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/cloud-sql/mysql/sqlalchemy)
+
+```python
+# The SQLAlchemy engine will help manage interactions, including automatically
+# managing a pool of connections to your database
+db = sqlalchemy.create_engine(
+    # Equivalent URL:
+    # mysql+pymysql://<db_user>:<db_pass>@/<db_name>?unix_socket=/cloudsql/<cloud_sql_instance_name>
+    sqlalchemy.engine.url.URL(
+        drivername='mysql+pymysql',
+        username=db_user,
+        password=db_pass,
+        database=db_name,
+        query={
+            'unix_socket': '/cloudsql/{}'.format(cloud_sql_instance_name)
+        }
+    ),
+    # ... Specify additional properties here.
+    # ...
+)
+```
