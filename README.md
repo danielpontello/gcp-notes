@@ -33,7 +33,7 @@ Para executar o Cloud SQL Proxy, é necessário a string de nome da instância d
 $ ./cloud_sql_proxy -instances=<INSTANCE_CONNECTION_NAME>=tcp:3306
 ```
 
-O banco de dados poderá então ser acessado utilizando o IP local (127.0.0.1 ou localhost) 
+O banco de dados poderá então ser acessado utilizando o IP local (127.0.0.1 ou localhost), utilizando os mesmos usuário e senha definidos na configuração do banco na GCP. 
 
 **Socket Unix:** Este método cria um socket UNIX em um diretório especificado pelo usuário. Este é o mesmo método utilizado internamente pelo App Engine, permitindo que as aplicações do App Engine sejam testadas em um ambiente local com mínimas alterações. Para utilizar este modo, primeiro crie um diretório que conterá o arquivo do socket (necessita de acesso root):
 
@@ -48,7 +48,7 @@ Após isso, execute o Proxy com:
 $ ./cloud_sql_proxy -dir=/cloudsql &
 ```
 
-O socket será criado na pasta /cloudsql/ com o nome da sua instância do Cloud SQL. Este socket então pode ser usado por sua aplicação para obter acesso ao Cloud SQL, como mostrado no exemplo abaixo. Exemplo completo disponível nos [samples oficiais do GCP no GitHub](https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/cloud-sql/mysql/sqlalchemy)
+O socket será criado na pasta /cloudsql/ com o nome da sua instância do Cloud SQL. Este socket então pode ser usado por sua aplicação App Engine para obter acesso ao Cloud SQL, como mostrado no exemplo abaixo. Exemplo completo disponível nos [samples oficiais do GCP no GitHub](https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/cloud-sql/mysql/sqlalchemy)
 
 ```python
 # The SQLAlchemy engine will help manage interactions, including automatically
