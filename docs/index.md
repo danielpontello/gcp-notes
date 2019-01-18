@@ -1,6 +1,6 @@
 ## Introdução
 
-Este repositório contém algumas anotações sobre os serviços do Google Cloud Platform, escritas a medida que vou descobrindo os recursos da plataforma.
+Este repositório contém algumas anotações sobre os serviços do Google Cloud Platform.
 
 ## Cloud Storage
 
@@ -50,7 +50,7 @@ def download_blob(bucket_name, source_file_name, destination_file_name):
 
     blob.download_to_filename(destination_file_name)
 
-    print('Blob {} downloaded to {}.'.format(
+    print('File {} downloaded to {}.'.format(
         source_file_name,
         destination_file_name))
 ```
@@ -65,7 +65,7 @@ Cloud Functions podem utilizar bibliotecas e acessar o sistema de arquivos norma
 
 ### Criando uma Function
 
-As Functions utilizam as mesmas estruturas de dados do [Flask](http://flask.pocoo.org/). Uma Cloud Function possui estrutura semelhante a apresentada abaixo:
+As Cloud Functions utilizam as mesmas estruturas de dados do servidor [Flask](http://flask.pocoo.org/). Uma Function possui estrutura semelhante a apresentada abaixo:
 
 ```python
 def hello_get(request):
@@ -74,7 +74,7 @@ def hello_get(request):
 
 A função recebe um parâmetro do tipo [Request](http://flask.pocoo.org/docs/1.0/api/#flask.Request), e pode retornar qualquer objeto compatível com o método [make_response](http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response).
 
-Para implementar esta função e fazê-la responder a requests HTTP, execute o comando:
+Para implementar esta função e fazê-la responder a requests HTTP, salve seu código com o nome `main.py` execute o comando:
 
 ```sh
 gcloud functions deploy hello_get --runtime python37 --trigger-http
@@ -89,7 +89,9 @@ gcloud functions describe hello_get
 A URL terá o formato `
 https://REGIAO_GCP-ID_DO_PROJETO.cloudfunctions.net/hello_get`. Para verificar o funcionamento da função, basta acessar esta URL em um navegador. Caso ela esteja funcionando, uma mensagem de "Hello World!" deverá aparecer em seu browser.
 
-### Executar função ao realizar upload no Cloud Storage
+Comandos como o `print` serão exibidos nos registros do Stackdriver, localizados [neste link](https://console.cloud.google.com/logs/viewer).
+
+### Executar uma função ao realizar ações no Cloud Storage
 
 Para fazer uma Function responder a eventos do Cloud Storage, é necessária a criação de uma Background Cloud Function. Ela tem a seguinte estrutura:
 
@@ -105,6 +107,38 @@ def hello_gcs_generic(data, context):
 ```
 
 O parâmetro `data` conterá os dados dos arquivos inseridos no Storage, como nome, bucket e data de criação. O arquivo atualizado pode ser acessado utilizando as bibliotecas do Cloud Storage e as funções padrão de acesso a arquivos do Python.
+
+### Variáveis de Ambiente
+
+Para definir as variáveis de ambiente para sua Function, crie um arquivo chamado `.env.yaml` na mesma pasta da sua function, com o seguinte formato:
+
+```yaml
+DB_USER: usuario
+DB_PASS: minhasenhasecreta
+DB_NAME: livros
+```
+
+Para utilizar o arquivo, durante o deploy da função, passe o parâmetro `--env-vars-file` com o nome do arquivo criado:
+
+```sh
+gcloud functions deploy minha_funcao --env-vars-file .env.yaml
+```
+
+As variáveis podem também ser definidas diretamente pela linha de comando:
+
+```sh
+gcloud functions deploy minha_funcao --set-env-vars DB_USER=usuario,DB_PASS=minhasenhasecreta DB_NAME=livros
+```
+
+Para acessá-las de dentro da Function, pode se utilizar a função `os.environ.get`:
+
+```python
+db_user = os.environ.get("DB_USER")
+db_pass = os.environ.get("DB_PASS")
+db_name = os.environ.get("DB_NAME")
+```
+
+As variáveis de ambiente podem ser utilizadas para armazenar dados sensíveis, como usuários e senhas de máquinas e bancos de dados. Como são voláteis (permanecem apenas na memória RAM), elas são consideradas mais seguras do que armazenamento em arquivos de configuração ou no código de sua aplicação.
 
 ## Cloud Source Repositories
 
