@@ -108,6 +108,21 @@ def hello_gcs_generic(data, context):
 
 O parâmetro `data` conterá os dados dos arquivos inseridos no Storage, como nome, bucket e data de criação. O arquivo atualizado pode ser acessado utilizando as bibliotecas do Cloud Storage e as funções padrão de acesso a arquivos do Python.
 
+Para realizar o deploy da função, execute o seguinte comando, substituindo NOME_DO_BUCKET pelo nome do seu bucket no Cloud Storage:
+
+```sh
+gcloud functions deploy hello_gcs_generic --runtime python37 --trigger-resource NOME_DO_BUCKET --trigger-event google.storage.object.finalize
+```
+
+O comando acima fará com que a função seja executada toda vez que um novo arquivo seja enviado para o Storage (trigger `google.storage.object.finalize`). Todos os possíveis triggers estão listados na tabela abaixo:
+
+| Trigger | Ação |
+|--------:|:-----|
+|`google.storage.object.finalize`| Acionado quando um arquivo é criado|
+|`google.storage.object.delete`|Acionado quando um arquivo é removido|
+|`google.storage.object.archive`|Acionado quando um arquivo é arquivado|
+|`google.storage.object.metadataUpdate`|Acionado quando os metadados de um arquivo são alterados|
+
 ### Variáveis de Ambiente
 
 Para definir as variáveis de ambiente para sua Function, crie um arquivo chamado `.env.yaml` na mesma pasta da sua function, com o seguinte formato:
