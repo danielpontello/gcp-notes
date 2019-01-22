@@ -57,6 +57,56 @@ def download_blob(bucket_name, source_file_name, destination_file_name):
 
 A documentação completa pode ser encontrada [aqui](https://cloud.google.com/storage/docs/reference/libraries).
 
+### `gcsfuse`
+
+O `gcsfuse` permite que um bucket do Cloud Storage seja montado em uma pasta do disco rígido, funcionando como um diretório normal (semelhante a ferramentas como o Dropbox e o OneDrive). Todas as operações com arquivos feitas na pasta serão refletidas no bucket do Cloud Storage.
+
+Para instalar o `gcsfuse`, adicione os repositórios em seu gerenciador de pacotes e importe suas chaves criptográficas:
+
+```sh
+export GCSFUSE_REPO=gcsfuse-`lsb_release -c -s`
+echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | sudo tee /etc/apt/sources.list.d/gcsfuse.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+```
+
+Após isto, atualize a lista de pacotes e instale o `gcsfuse`:
+
+```sh
+sudo apt-get update
+sudo apt-get install gcsfuse
+```
+
+Para mapear um bucket para uma pasta, execute o `gcsfuse` da seguinte forma:
+
+```sh
+gcsfuse meu-bucket pasta/
+```
+
+**Importante**: execute o `gcsfuse` como usuário normal, e não como root!
+
+O conteúdo do bucket pode ser verificado utilizando os comandos comuns do Linux, como o `cd` e o `ls`:
+
+```sh
+cd pasta/
+ls
+```
+
+Ao ler ou gravar algum arquivo na pasta, ele terá de ser baixado para sua máquina ou enviado para o Cloud Storage. Por isso, a velocidade de acesso a estes arquivos é altamente dependente de sua conexão a internet.
+
+Caso ocorram erros durante a leitura ou a escrita dos arquivos, o modo de depuração do `gcsfuse` pode ser ativado com a flag `--debug_gcs`:
+
+```sh
+gcsfuse --foreground --debug_gcs meu-bucket pasta/
+```
+
+A flag `--foreground` mantém o processo em primeiro plano, permitindo que as mensagens de log sejam impressas. Por isso, não feche o terminal em que o comando estiver rodando enquanto utilizar a pasta montada.
+
+Ao terminar de utilizar a pasta, desative o `gcsfuse` com o comando:
+
+```sh
+fusermount -u pasta/
+```
+
 ## Cloud Functions
 
 Cloud Functions são funções que são executadas 'serverless', sem a necessidade de configuração de um servidor, e são ativadas via requisições HTTP. Elas também podem ser executadas como resposta a certos eventos (upload no Cloud Storage, inserção no Cloud SQL, etc.).
