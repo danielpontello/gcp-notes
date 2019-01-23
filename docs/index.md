@@ -1,6 +1,32 @@
-## Introdução
+## gcp-notes
 
-Este repositório contém algumas anotações sobre os serviços do Google Cloud Platform.
+Bem vindo! Este repositório contém algumas anotações e dicas sobre os serviços do Google Cloud Platform.
+
+Contribuições são bem vindas! Crie um [Issue](https://github.com/danielpontello/gcp-notes/issues) caso encontre erros ou um [Pull Request](https://github.com/danielpontello/gcp-notes/pulls) com correções.
+
+
+## `gcloud` CLI
+
+O `gcloud` é uma ferramenta de linha para todos os serviços da Google Cloud Platform. Com ela é possível gerenciar e automatizar tarefas na plataforma.
+
+Para instalar a ferramenta, basta rodar o comando:
+
+```sh
+curl https://sdk.cloud.google.com | bash
+```
+
+Após a instalação, é necessário inicializar o ambiente e fazer login com os comando:
+
+```sh
+gcloud init
+gcloud auth login
+```
+
+Selecione um projeto com o comando abaixo:
+
+```sh
+gcloud config set project <meu_projeto>
+```
 
 ## Cloud Storage
 
